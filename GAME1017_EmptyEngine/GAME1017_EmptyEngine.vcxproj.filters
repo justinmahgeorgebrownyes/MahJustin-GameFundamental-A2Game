@@ -60,6 +60,8 @@
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="Bound.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="HealthBar.cpp" />
+    <ClCompile Include="FontManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -103,6 +105,8 @@
     <ClInclude Include="Background.h" />
     <ClInclude Include="Bound.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="HealthBar.h" />
+    <ClInclude Include="FontManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Dat\Level1.txt">

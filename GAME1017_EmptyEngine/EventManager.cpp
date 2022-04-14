@@ -2,7 +2,15 @@
 #include "Engine.h"
 #include <cstring>
 #include <iostream>
-
+#include <ctime>
+#include "Engine.h"
+#include "FontManager.h"
+#include "TextureManager.h"
+#include "States.h"
+#include "Primitives.h"
+#define WIDTH 1024
+#define HEIGHT 768
+#define FPS 60
 void EventManager::Init()
 {
 	s_keysCurr = SDL_GetKeyboardState(&s_numKeys);
@@ -34,7 +42,10 @@ void EventManager::HandleEvents()
 			case SDL_KEYUP:
 				s_lastKeyUp = event.key.keysym.sym;
 				if (event.key.keysym.sym == SDLK_ESCAPE)
-					Engine::Instance().Running() = false; // Should be: .SetRunning(false);
+					Engine::Instance().Running() = false;
+				
+				
+				
 				break;
 		}
 	}

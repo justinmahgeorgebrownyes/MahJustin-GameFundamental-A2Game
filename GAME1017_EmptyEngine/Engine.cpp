@@ -48,11 +48,17 @@ void Engine::Wake()
 void Engine::HandleEvents()
 {
 	EVMA::HandleEvents();
+
+
 }
+
+
+
+
 
 void Engine::Update()
 {
-
+	
 
 
 
@@ -61,7 +67,12 @@ void Engine::Update()
 
 void Engine::Render()
 {
+
+
+
 	STMA::Render();
+
+
 }
 
 void Engine::Sleep()

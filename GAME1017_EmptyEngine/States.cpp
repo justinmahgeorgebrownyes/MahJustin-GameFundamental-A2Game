@@ -9,7 +9,14 @@
 #include "Button3.h"
 #include "PlatformPlayer.h"
 #include "GameObject.h"
+#include "FontManager.h"
 #include <iostream>
+#include <ctime>
+
+#define WIDTH 1024
+#define HEIGHT 768
+#define FPS 60
+
 using namespace std;
 
 void State::Render()
@@ -85,7 +92,8 @@ void TitleState::Exit()
 // End TitleState
 
 // Begin GameState
-GameState::GameState() {}
+GameState::GameState(){}
+
 
 void GameState::Enter() // Used for initialization.
 {
@@ -94,6 +102,18 @@ void GameState::Enter() // Used for initialization.
 	for (int i = 0; i < 9; i++) {
 		m_vec.push_back(new Box({ 128 * i, 384 }));
 	}
+	FOMA::Load("Img/ltype.TTF", "Label", 24);
+
+	m_fps = (Uint32)round((1 / (double)FPS) * 1000); // Sets FPS in milliseconds and rounds.
+	m_iKeystates = SDL_GetKeyboardState(nullptr);
+	srand((unsigned)time(NULL)); // Seed random number sequence.
+	m_label = new Label("Label", 300, 300, "Time: 0");
+	m_timer.Start();
+
+	m_healthBar = new HealthBar(100);
+
+
+
 
 	TEMA::Load("Img/BG.png", "bg");
 
@@ -155,6 +175,8 @@ void GameState::Enter() // Used for initialization.
 
 void GameState::Update()
 {
+
+	m_timer.Update();
 	//scrollingpaart
 	for (auto bg : m_vec_background)
 	bg->Update();
@@ -236,11 +258,32 @@ void GameState::Update()
 
 }
 
-void GameState::Render()
+
+
+
+// Keyboard utility function.
+bool GameState::KeyDown(SDL_Scancode c)
+{
+	if (m_iKeystates != nullptr)
+	{
+		if (m_iKeystates[c] == 1)
+			return true;
+		else
+			return false;
+	}
+	return false;
+}
+
+
+int GameState::Run()
 {
 	
-	
+	return 0;
+}
 
+
+void GameState::Render()
+{
 
 	// Render stuff.
 	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 0, 0, 0, 255);
@@ -249,6 +292,24 @@ void GameState::Render()
 
 	for (auto bg : m_vec_background)
 		bg->Render();
+
+
+	//timers
+	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(m_pRenderer); // Clear the screen with the draw color.
+	// Render stuff.
+	if (m_timer.HasChanged()) {
+		string temp = "Time: " + m_timer.GetTime();
+		m_label->SetText(temp.c_str());
+	}
+
+	m_label->Render();
+	m_healthBar->Render();
+	// Draw anew.
+
+	SDL_RenderPresent(m_pRenderer);
+
+
 
 	for (auto const& i : m_objects)
 		i.second->Render();
@@ -275,6 +336,16 @@ void GameState::Render()
 
 void GameState::Exit()
 {
+
+	cout << "Cleaning game." << endl;
+	delete m_healthBar;
+	SDL_DestroyRenderer(m_pRenderer);
+	SDL_DestroyWindow(m_pWindow);
+	FOMA::Quit();
+	TEMA::Quit();
+	IMG_Quit();
+	SDL_Quit();
+
 	for (auto& i : m_objects)
 	{
 		delete i.second;
