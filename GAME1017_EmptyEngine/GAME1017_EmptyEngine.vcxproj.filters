@@ -56,6 +56,10 @@
       <Filter>States</Filter>
     </ClCompile>
     <ClCompile Include="PlatformPlayer.cpp" />
+    <ClCompile Include="Box.cpp" />
+    <ClCompile Include="Background.cpp" />
+    <ClCompile Include="Bound.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -95,6 +99,10 @@
       <Filter>States</Filter>
     </ClInclude>
     <ClInclude Include="PlatformPlayer.h" />
+    <ClInclude Include="Box.h" />
+    <ClInclude Include="Background.h" />
+    <ClInclude Include="Bound.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Dat\Level1.txt">

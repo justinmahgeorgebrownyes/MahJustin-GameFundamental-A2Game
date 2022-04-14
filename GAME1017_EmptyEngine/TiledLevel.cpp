@@ -61,7 +61,16 @@ TiledLevel::~TiledLevel()
 
 void TiledLevel::Render()
 {
-	for (unsigned short row = 0; row < m_rows; row++) {
+	for (unsigned short row = 0; row < m_obstacles.size(); row++) {
+		SDL_RenderCopyF(Engine::Instance().GetRenderer(), TEMA::GetTexture(m_tilekey),
+			m_obstacles[row]->GetSrc(), m_obstacles[row]->GetDst());
+	}
+
+
+}
+/*
+
+for (unsigned short row = 0; row < m_rows; row++) {
 		for (unsigned short col = 0; col < m_cols; col++) {
 			SDL_RenderCopyF(Engine::Instance().GetRenderer(), TEMA::GetTexture(m_tilekey),
 				m_level[row][col]->GetSrc(), m_level[row][col]->GetDst());
@@ -69,4 +78,4 @@ void TiledLevel::Render()
 	}
 
 
-}
+*/

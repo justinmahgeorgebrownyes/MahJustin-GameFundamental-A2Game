@@ -4,9 +4,14 @@
 
 #include "TiledLevel.h"
 #include "GameObject.h"
-
+#include "Box.h"
+#include "Background.h"
 class State // This is the abstract base class for all states
 {
+private:
+
+
+
 public:
 	virtual void Enter() = 0; // = 0 means pure virtual - must be defined in subclass
 	virtual void Update() = 0;
@@ -33,7 +38,22 @@ public:
 
 class GameState : public State
 {
+private:
+
+	//scrolling psirce part
+
+	vector<Box*> m_vec;
+	map<string, Box*> m_protos;
+
+	string m_keys[3] = { "yeti", "abominable", "snowman" };
+
+	int m_gapCtr, m_gapMax;
+
+	vector<Background*> m_vec_background;
+	vector<SDL_Rect*> m_sources;
+
 public:
+	
 	GameState();
 	virtual void Enter();
 	virtual void Update();

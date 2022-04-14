@@ -90,6 +90,55 @@ GameState::GameState() {}
 void GameState::Enter() // Used for initialization.
 {
 
+	m_vec.reserve(9);
+	for (int i = 0; i < 9; i++) {
+		m_vec.push_back(new Box({ 128 * i, 384 }));
+	}
+
+	TEMA::Load("Img/BG.png", "bg");
+
+	// Create the vector now.
+	 m_vec_background.reserve(10);//to prevent growth of 1.5x in push_back
+	m_sources.reserve(3);
+
+
+	// Backgrounds.
+	m_sources.push_back(new SDL_Rect{ 0,0,1024,768 });
+	 m_vec_background.push_back(new Background(m_sources[0], { 0,0,1024,768 }, 1));
+	 m_vec_background.push_back(new Background(m_sources[0], { 1024,0,1024,768 }, 1));
+
+
+	// Midgrounds.
+	m_sources.push_back(new SDL_Rect{ 1024,0,256,512 });
+
+	 m_vec_background.push_back(new Background(m_sources[1], { 0,0,256,512 }, 3));
+	 m_vec_background.push_back(new Background(m_sources[1], { 256,0,256,512 }, 3));
+	 m_vec_background.push_back(new Background(m_sources[1], { 512,0,256,512 }, 3));
+	 m_vec_background.push_back(new Background(m_sources[1], { 768,0,256,512 }, 3));
+	 m_vec_background.push_back(new Background(m_sources[1], { 1024,0,256,512 }, 3));
+
+	// Foregrounds.
+	m_sources.push_back(new SDL_Rect{ 1024,512,512,256 });
+
+	 m_vec_background.push_back(new Background(m_sources[2], { 0,512,512,256 }, 4));
+	 m_vec_background.push_back(new Background(m_sources[2], { 512,512,512,256 }, 4));
+	 m_vec_background.push_back(new Background(m_sources[2], { 1024,512,512,256 }, 4));
+
+
+
+	TEMA::Load("Img/yeti.png", "yeti");//390 * 443
+	TEMA::Load("Img/abominable.png", "abominable");//340 * 417
+	TEMA::Load("Img/snowman.png", "snowman");//1000 * 1000
+
+	m_protos.emplace("yeti", new Box({ 1024, 384 }, true, { 1024, 384, 128, 128 }, { 255, 64, 128, 255 }, { 0, 0, 390, 443 }, "yeti"));
+	m_protos.emplace("abominable", new Box({ 1024, 384 }, true, { 1056, 0, 64, 384 }, { 64, 255, 32, 255 }, { 0, 0, 340, 417 }, "abominable"));
+	m_protos.emplace("snowman", new Box({ 1024, 384 }, true, { 1024, 448, 128, 64 }, { 234, 215, 84, 255 }, { 0, 0, 1000, 1000 }, "snowman"));
+
+	m_gapCtr = 0;
+	m_gapMax = 3;
+
+
+
 	TEMA::Load("Img/Tiles.png", "tiles");
 
 	//loda player image and give it a string key of "player"..
@@ -106,6 +155,39 @@ void GameState::Enter() // Used for initialization.
 
 void GameState::Update()
 {
+	//scrollingpaart
+	for (auto bg : m_vec_background)
+	bg->Update();
+
+
+
+	//from scrolling sprites part
+		// Check if first column of main vector goes out of bounds.
+	if (m_vec[0]->GetPos().x <= -128) {
+		delete m_vec[0];
+		m_vec.erase(m_vec.begin());
+
+		if (m_gapCtr++ % m_gapMax == 0) {
+			SDL_Color col = { 100 + rand() % 156, 100 + rand() % 156, 100 + rand() % 156, 255 };
+
+			m_vec.push_back(m_protos[m_keys[rand() % 3]]->Clone());
+
+			//m_vec.push_back(new Box({ 1024, 284 }, true, { 1024, 384, 128, 128 }, col));
+		}
+		else m_vec.push_back(new Box({ 1024, 384 }));
+	}
+
+
+
+	// Scroll the boxes.
+
+	//update the boxes which scrol themselves
+	for (unsigned int i = 0; i < m_vec.size(); i++) {
+		m_vec[i]->Update();
+	}
+
+
+
 	if (EVMA::KeyPressed(SDL_SCANCODE_X))
 	{
 		STMA::ChangeState(new TitleState());
@@ -156,10 +238,37 @@ void GameState::Update()
 
 void GameState::Render()
 {
+	
+	
+
+
+	// Render stuff.
 	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 0, 0, 0, 255);
 	SDL_RenderClear(Engine::Instance().GetRenderer());
+
+
+	for (auto bg : m_vec_background)
+		bg->Render();
+
 	for (auto const& i : m_objects)
 		i.second->Render();
+
+
+	
+
+
+	//sprite scrolling
+	for (unsigned int i = 0; i < m_vec.size(); i++) {
+		m_vec[i]->Render();
+
+	}
+
+
+
+
+
+
+	
 	if (dynamic_cast<GameState*>(STMA::GetStates().back()))
 		State::Render();
 }
@@ -173,6 +282,13 @@ void GameState::Exit()
 	}
 	m_objects.clear();
 	m_objects.shrink_to_fit();
+
+
+
+	for (unsigned int i = 0; i < m_vec.size(); i++) {
+		delete m_vec[i];
+		m_vec[i] = nullptr;
+	}
 }
 
 void GameState::Resume() {}
