@@ -40,6 +40,8 @@ public:
 	void Render();
 	const SDL_Point GetPos() { return m_pos; }
 
+	const SDL_Rect GetRect() { return m_pSprite->m_dst; }
+
 	//psrite access
 
 };

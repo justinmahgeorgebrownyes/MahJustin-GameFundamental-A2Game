@@ -131,3 +131,5 @@ void Engine::Clean()
 
 bool& Engine::Running() { return m_running; } // Getter.
 void Engine::SetRunning(const bool b) { m_running = b; }
+
+

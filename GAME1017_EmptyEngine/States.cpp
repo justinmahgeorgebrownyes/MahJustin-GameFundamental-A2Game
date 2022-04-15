@@ -115,6 +115,9 @@ void GameState::Enter() // Used for initialization.
 
 
 
+
+
+
 	TEMA::Load("Img/BG.png", "bg");
 
 	// Create the vector now.
@@ -176,11 +179,26 @@ void GameState::Enter() // Used for initialization.
 void GameState::Update()
 {
 
+	
+
+
 	m_timer.Update();
 	//scrollingpaart
 	for (auto bg : m_vec_background)
 	bg->Update();
 
+
+	SDL_FRect* playerFRect = GetGo("player")->GetDst();
+	SDL_Rect playerRect = { (int)playerFRect->x , (int)playerFRect-> y, (int)playerFRect->w, (int)playerFRect->h };
+
+	for (int i = 0; i < m_vec.size(); i++)
+	{
+		if (SDL_HasIntersection(&playerRect,
+			&m_vec[i]->GetRect()) == SDL_TRUE) {
+			STMA::ChangeState(new LoseState());
+		}
+	
+	}
 
 
 	//from scrolling sprites part
@@ -208,7 +226,11 @@ void GameState::Update()
 		m_vec[i]->Update();
 	}
 
-
+	if (EVMA::KeyPressed(SDL_SCANCODE_P)) {
+		cout << "changing to pausestate" << endl;
+		//pause the music track
+		STMA::PushState(new PauseState());
+	}
 
 	if (EVMA::KeyPressed(SDL_SCANCODE_X))
 	{
@@ -364,3 +386,80 @@ void GameState::Exit()
 
 void GameState::Resume() {}
 // End GameState
+
+
+
+EndState::EndState()
+{
+}
+
+void EndState::Enter()
+{
+}
+
+void EndState::Update()
+{
+}
+
+void EndState::Render()
+{
+}
+
+void EndState::Exit()
+{
+}
+
+
+
+PauseState::PauseState()
+{
+	m_resumeButtonRect = { 255, 128, 512, 512 };
+
+}
+
+void PauseState::Enter()
+{
+
+	//m_backgroundImage = IMG_LoadTexture(m_pRenderer, "Img\\background_ccexpress.jpeg");
+	//m_startImage = IMG_LoadTexture(m_pRenderer, "Img\\start.png");
+	//m_exitButtonImage = IMG_LoadTexture(m_pRenderer, "Img\\exit.jfif");
+	m_resumeButtonTexture = IMG_LoadTexture(Engine::Instance().GetRenderer(), "Img\\resume.png");
+}
+
+void PauseState::Update()
+{
+
+	if (EventManager::ButtonPressed(1, m_resumeButtonRect)){
+		cout << "changing to gamstate" << endl;
+		STMA::ChangeState(new GameState());
+	}
+}
+
+void PauseState::Render()
+{
+	STMA::GetStates().front()->Render();
+
+	//herw we draw a transparent box
+	SDL_SetRenderDrawBlendMode(Engine::Instance().GetRenderer(), SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 255, 0, 0, 128);
+	SDL_Rect rect = { 255, 128, 512, 512 };
+	SDL_RenderFillRect(Engine::Instance().GetRenderer(), &rect);
+
+
+
+
+	//here we drwaw a non transparent resume button.
+	SDL_SetRenderDrawBlendMode(Engine::Instance().GetRenderer(), SDL_BLENDMODE_NONE);
+	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 255, 0, 0, 128);
+	SDL_RenderFillRect(Engine::Instance().GetRenderer(), &m_resumeButtonRect);
+
+	//Engine::Instance().ResumeButton(&m_button2);
+
+	SDL_RenderCopy(Engine::Instance().GetRenderer(), m_resumeButtonTexture, NULL, &m_resumeButtonRect);
+
+	State::Render();
+}
+
+void PauseState::Exit()
+{
+}

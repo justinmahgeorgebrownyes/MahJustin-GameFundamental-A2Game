@@ -16,6 +16,10 @@ using namespace std;
 class Engine
 {
 private: // private properties.
+
+
+
+
 	bool m_running = false;
 	Uint32 m_start, m_startLast, m_end, m_delta, m_fps;
 	double m_deltaTime;
@@ -35,6 +39,15 @@ private: // private method prototypes.
 	void Sleep();
 
 public: // public method prototypes.
+
+
+	bool KeyDown(SDL_Scancode c);
+	bool MouseClick(SDL_Rect button);
+	void BackgroundMusic();
+	void BackgroundImage();
+
+
+
 	int Run();
 	static Engine& Instance(); // Static method for object access.
 	SDL_Renderer* GetRenderer() const { return m_pRenderer; }

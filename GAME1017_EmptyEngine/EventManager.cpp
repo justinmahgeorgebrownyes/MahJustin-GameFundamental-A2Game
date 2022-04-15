@@ -93,6 +93,29 @@ bool EventManager::MouseHeld(const int b)
 		return false;
 }
 
+bool EventManager::ButtonPressed(const int b, SDL_Rect buttons) {
+
+	int xMousePos = GetMousePos().x;
+	int yMousePos = GetMousePos().y;
+
+	int buttonX = buttons.x;
+	int buttonY = buttons.y;
+	int buttonW = buttons.w;
+	int buttonH = buttons.h;
+
+
+	if (MousePressed(b) && (xMousePos <= buttonX + buttonW && xMousePos >= buttonX) && (yMousePos <= buttonY + buttonH && yMousePos >= buttonY)) {
+
+		return true;
+
+	}
+	
+	return false;
+	
+	//(xMousePos <= buttonX )(yMousePos <= buttonY )(buttonX <= buttonW) (buttonY <= buttonH))
+}
+
+
 bool EventManager::MousePressed(const int b)
 {
 	return ((s_mouseCurr & SDL_BUTTON(b)) > (s_mouseLast & SDL_BUTTON(b)));

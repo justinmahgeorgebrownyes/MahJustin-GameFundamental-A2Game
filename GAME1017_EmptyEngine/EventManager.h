@@ -15,6 +15,7 @@ public: // Public methods.
 	static int LastKeyDown();
 	static int LastKeyUp();
 	static bool MouseHeld(const int b);
+	static bool ButtonPressed(const int b, SDL_Rect buttons);
 	static bool MousePressed(const int b);
 	static bool MouseReleased(const int b);
 	static SDL_Point& GetMousePos();

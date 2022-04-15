@@ -97,5 +97,40 @@ public:
 	virtual void Resume();
 };
 
+
+
+class EndState : public State {
+private:
+
+public:
+	EndState();
+	void Enter();
+	void Update();
+	void Render();
+	void Exit();
+
+
+};
+
+
+
+class PauseState : public State {
+protected:
+	SDL_Rect m_resumeButtonRect;
+	SDL_Texture* m_resumeButtonTexture;
+
+
+public:
+	PauseState();
+	void Enter();
+	void Update();
+	void Render();
+	void Exit();
+
+
+};
+
+
+
 #endif
 
