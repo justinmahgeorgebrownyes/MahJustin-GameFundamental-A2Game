@@ -17,7 +17,6 @@ using namespace std;
 class State // This is the abstract base class for all states
 {
 private:
-	
 
 public:
 	virtual void Enter() = 0; // = 0 means pure virtual - must be defined in subclass
@@ -46,9 +45,11 @@ public:
 class GameState : public State
 {
 protected:
-	
+	SDL_Rect m_exitButtonRect;
+	SDL_Texture* m_exitButtonTexture;
 
 private:
+	Mix_Music* m_backmusic;
 
 	void Wake();
 	void Sleep();
@@ -81,14 +82,14 @@ private:
 	vector<SDL_Rect*> m_sources;
 
 public:
-
+	void BackgroundMusic();
 
 	int Run();
 // This static method creates the static instance that can be accessed 'globally'
 	bool KeyDown(SDL_Scancode c);
 	SDL_Renderer* GetRenderer();
 
-	
+
 	GameState();
 	virtual void Enter();
 	virtual void Update();
@@ -99,11 +100,11 @@ public:
 
 
 
-class EndState : public State {
+class LoseState : public State {
 private:
 
 public:
-	EndState();
+	LoseState();
 	void Enter();
 	void Update();
 	void Render();

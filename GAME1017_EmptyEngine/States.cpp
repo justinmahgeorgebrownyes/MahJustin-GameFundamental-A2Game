@@ -55,9 +55,16 @@ TitleState::TitleState() {}
 
 void TitleState::Enter()
 {
+
+	TEMA::Load("Img/Title.png", "title");
+
+
 	TEMA::Load("Img/button.png", "play");
+	m_objects.push_back(pair<string, GameObject*>("title",
+		new Image({ 0, 0, 10000, 1600 }, { 112, 100, 800, 500 }, "title")));
 	m_objects.push_back(pair<string, GameObject*>("play",
 		new PlayButton({ 0, 0, 400, 100 }, { 412, 350, 200, 50 }, "play")));
+
 }
 
 void TitleState::Update()
@@ -92,7 +99,22 @@ void TitleState::Exit()
 // End TitleState
 
 // Begin GameState
-GameState::GameState(){}
+GameState::GameState(){
+
+
+
+}
+
+void GameState::BackgroundMusic() {
+
+	// play music forever
+	// Mix_Music *music; // I assume this has been loaded already
+	if (Mix_PlayMusic(m_backmusic, -1) == -1) {
+		printf("Mix_PlayMusic: %s\n", Mix_GetError());
+		// well, there's no music, but most games don't break without music...
+	}
+
+}
 
 
 void GameState::Enter() // Used for initialization.
@@ -113,12 +135,25 @@ void GameState::Enter() // Used for initialization.
 	m_healthBar = new HealthBar(100);
 
 
+	SOMA::Load("Aud/Background.mp3", "background", SOUND_MUSIC);
+	GameState::BackgroundMusic();
+
+	Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 2048);
+	Mix_AllocateChannels(16);
+
+	m_backmusic = Mix_LoadMUS("Aud\\background.mp3");
+	SOMA::AllocateChannels(16);
+	SOMA::SetMusicVolume(32);
+	SOMA::PlayMusic("background", -1, 2000);
 
 
-
-
+	m_exitButtonRect = { 112, 100, 1000, 250 };
 
 	TEMA::Load("Img/BG.png", "bg");
+
+	TEMA::Load("Img/Exit.png", "exit");
+	m_objects.push_back(pair<string, GameObject*>("exit",
+		new Image({ 0, 0, 10000, 800 }, { 112, 100, 1000, 250 }, "exit")));
 
 	// Create the vector now.
 	 m_vec_background.reserve(10);//to prevent growth of 1.5x in push_back
@@ -179,7 +214,15 @@ void GameState::Enter() // Used for initialization.
 void GameState::Update()
 {
 
+
+	if (EventManager::ButtonPressed(1, m_exitButtonRect)) {
+		cout << "exiting" << endl;
+
+		GameState::Exit();
+	}
+
 	
+
 
 
 	m_timer.Update();
@@ -193,12 +236,43 @@ void GameState::Update()
 
 	for (int i = 0; i < m_vec.size(); i++)
 	{
-		if (SDL_HasIntersection(&playerRect,
-			&m_vec[i]->GetRect()) == SDL_TRUE) {
+		SDL_Rect hi = m_vec[i]->GetRect();
+
+
+		bool hhello = SDL_HasIntersection(&playerRect, &(hi));
+
+		if (hhello == SDL_TRUE) {
 			STMA::ChangeState(new LoseState());
+			return;
 		}
 	
 	}
+
+	
+	
+
+	//if (GetGo("player") != nullptr)
+	//{
+	//	// BUT OUR CODE IS IN ANOTHER CASTLE!
+	//	// Creating some temporary fields (all as pointers for consistency) for convenience.
+	//	//vector<Box*>* field = &static_cast<Box*>(GetGo("player")->GetDst());
+	//	PlatformPlayer* ship = static_cast<PlatformPlayer*>(GetGo("player"));
+	//	// Player vs. asteroids first.
+	//	for (unsigned int i = 0; i < m_vec.size(); i++)
+	//	{
+	//		Box* ast = m_vec[i];
+	//		if (COMA::CircleCircleCheck(ship->GetDst(), ast->GetRect(),
+	//			ship->GetDst(), ast->GetRect()) )
+	//		{
+	//			SOMA::PlaySound("explode");
+	//			delete ship;
+	//			m_objects.erase(GetIt("player")); // Erases whole ship std::pair.
+	//			m_objects.shrink_to_fit();
+	//			return;
+	//		}
+	//	}
+	//}
+
 
 
 	//from scrolling sprites part
@@ -237,6 +311,23 @@ void GameState::Update()
 		STMA::ChangeState(new TitleState());
 		return;
 	}
+
+	if (EVMA::KeyPressed(SDL_SCANCODE_D)) {
+		cout << "walking sounds" << endl;
+		//pause the music track
+
+		SOMA::Load("Aud/Walk.wav", "walk", SOUND_MUSIC);
+		GameState::BackgroundMusic();
+
+		Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 2048);
+		Mix_AllocateChannels(16);
+
+		m_backmusic = Mix_LoadMUS("Aud\\Walk.wav");
+		SOMA::AllocateChannels(16);
+		SOMA::SetMusicVolume(32);
+		SOMA::PlayMusic("walk", -1, 2000);
+	}
+
 	for (auto const& i : m_objects)
 	{
 		i.second->Update();
@@ -337,7 +428,20 @@ void GameState::Render()
 		i.second->Render();
 
 
-	
+	//
+	//herw we draw a transparent box
+	//SDL_SetRenderDrawBlendMode(Engine::Instance().GetRenderer(), SDL_BLENDMODE_BLEND);
+	//SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 255, 0, 0, 128);
+	//SDL_Rect rect = { 255, 128, 512, 512 };
+	//SDL_RenderFillRect(Engine::Instance().GetRenderer(), &rect);
+
+
+
+
+	//here we drwaw a non transparent resume button.
+	SDL_SetRenderDrawBlendMode(Engine::Instance().GetRenderer(), SDL_BLENDMODE_NONE);
+	//SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 255, 0, 0, 128);
+	//SDL_RenderFillRect(Engine::Instance().GetRenderer(), &m_exitButtonRect);
 
 
 	//sprite scrolling
@@ -367,6 +471,10 @@ void GameState::Exit()
 	TEMA::Quit();
 	IMG_Quit();
 	SDL_Quit();
+	Mix_FreeMusic(m_backmusic);
+	Mix_CloseAudio();
+	Mix_Quit();
+
 
 	for (auto& i : m_objects)
 	{
@@ -389,23 +497,25 @@ void GameState::Resume() {}
 
 
 
-EndState::EndState()
+LoseState::LoseState()
+{
+	cout << "you lose";
+}
+
+void LoseState::Enter()
+{
+//;
+}
+
+void LoseState::Update()
 {
 }
 
-void EndState::Enter()
+void LoseState::Render()
 {
 }
 
-void EndState::Update()
-{
-}
-
-void EndState::Render()
-{
-}
-
-void EndState::Exit()
+void LoseState::Exit()
 {
 }
 
@@ -419,7 +529,7 @@ PauseState::PauseState()
 
 void PauseState::Enter()
 {
-
+	
 	//m_backgroundImage = IMG_LoadTexture(m_pRenderer, "Img\\background_ccexpress.jpeg");
 	//m_startImage = IMG_LoadTexture(m_pRenderer, "Img\\start.png");
 	//m_exitButtonImage = IMG_LoadTexture(m_pRenderer, "Img\\exit.jfif");
@@ -463,3 +573,4 @@ void PauseState::Render()
 void PauseState::Exit()
 {
 }
+

@@ -22,6 +22,8 @@ m_maxVelX(9.0), m_maxVelY(JUMPFORCE), m_grav(GRAVITY), m_drag(0.85)
 			key = (char)'a' + x + (9 * y);
 
 
+
+
 			m_tiles.emplace(key, new Tile({ x * w, y * h, w, h },
 				{ 0.0f, 0.0f, (float)64, (float)64 }, 0, 0));
 		}

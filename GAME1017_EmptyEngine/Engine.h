@@ -43,7 +43,7 @@ public: // public method prototypes.
 
 	bool KeyDown(SDL_Scancode c);
 	bool MouseClick(SDL_Rect button);
-	void BackgroundMusic();
+
 	void BackgroundImage();
 
 
